@@ -21,7 +21,7 @@ set matchtime=3 " match for 3s(?)
 " show status bar
 set laststatus=2
 " get vim to autoindent based on file indentation, hopefully...
-set autoindent
+set smartindent
 " set defaults for split panes
 set splitbelow
 set splitright
@@ -104,7 +104,11 @@ set foldmethod=indent
 " define `,` to open and close folds
 nnoremap <space> za
 
+" focus current fold (aka close all others except current)
+nnoremap <leader>z zMzvzz
+
 " }}}
+
 " }}}
 " Line {{{
 
@@ -141,6 +145,13 @@ nnoremap gV `[v`]
 " enter normal mode aka do <esc>
 inoremap jk <esc>
 
+" delete to end of line
+nnoremap D d$
+
+" go to beginning and end of line in insert mode
+inoremap <c-a> <esc>I
+inoremap <c-e> <esc>A
+
 " }}}
 
 " }}}
@@ -161,6 +172,12 @@ set gdefault
 
 " clear search highlights
 nnoremap <leader><space> :nohlsearch<CR>
+" when going forward and back keep the line in the middle of the screen
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" open Quickfix window for the last search
+nnoremap <silent> <leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
 " }}}
 
@@ -175,8 +192,6 @@ nnoremap <leader>ev :vsp $MYVIMRC<CR>
 nnoremap <leader>ez :vsp ~/.zshrc<CR>
 " source vimrc
 nnoremap <leader>sv :source $MYVIMRC<CR>
-" save session (window layouts, open files etc.)
-nnoremap <leader>s :mksession<CR>
 
 " }}}
 
@@ -503,6 +518,11 @@ let g:pymode_rope_local_prefix = '<localleader>r'
 let g:pymode_rope_enable_autoimport = 0
 
 " }}}
+" scss-syntax | proper scss syntax highlighting {{{
+
+Plugin 'cakebaker/scss-syntax.vim'
+
+" }}}
 " splitjoin {{{
 
 Plugin 'AndrewRadev/splitjoin.vim'
@@ -513,9 +533,9 @@ Plugin 'AndrewRadev/splitjoin.vim'
 Plugin 'ervandew/supertab'
 
 " }}}
-" scss-syntax | proper scss syntax highlighting {{{
+" surround {{{
 
-Plugin 'cakebaker/scss-syntax.vim'
+Plugin 'tpope/vim-surround'
 
 " }}}
 " vim-javascript {{{
@@ -529,7 +549,7 @@ Plugin 'othree/xml.vim'
 
 " }}}
 
-" Colors {{{
+" Colors / themes {{{
 
 Plugin 'whatyouhide/vim-gotham'
 
