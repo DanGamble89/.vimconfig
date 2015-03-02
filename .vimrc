@@ -552,6 +552,7 @@ Plugin 'othree/xml.vim'
 " Colors / themes {{{
 
 Plugin 'whatyouhide/vim-gotham'
+Plugin 'morhetz/gruvbox'
 
 " }}}
 
