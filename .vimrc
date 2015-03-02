@@ -26,6 +26,7 @@ set smartindent
 set splitbelow
 set splitright
 set colorcolumn=+1
+
 " return to line open before last close
 augroup line_return
     au!
@@ -46,9 +47,15 @@ let maplocalleader = "\\"
 noremap <F1> :checktime<cr>
 inoremap <F1> <esc>:checktime<cr>
 
+" buffer close
+noremap <leader>w :bd<cr>
+" buffer open
+noremap <leader>q :vert sb 
+
 " }}}
 
 " }}}
+
 " Backups {{{
 
 " enable backups
@@ -217,16 +224,6 @@ set ttimeout
 set timeoutlen=10
 
 " }}}
-" {{{ Theme
-
-" we want syntax..
-syntax enable
-" we also prefer dark styles
-set background=dark
-" my current favourite theme atm
-colorscheme gruvbox
-
-" }}}
 " Wildmenu {{{
 
 " visual autocomplete for command menu
@@ -236,7 +233,6 @@ set wildmode=list:longest
 set wildignore+=.hg,.git,.svn
 set wildignore+=.jpg,*.bmp,*.gif,*.png,*.jpeg
 set wildignore+=*.DS_STORE
-set wildignore+=migrations
 set wildignore+=*.pyc
 set wildignore+=*.sass-cache
 
@@ -299,8 +295,6 @@ augroup END
 " }}}
 " HTML, Django, Jinga {{{
 
-let g:html_indent_tags = ['p', 'li']
-
 augroup ft_html
     au!
 
@@ -332,7 +326,6 @@ augroup ft_javascript
 
     au FileType javascript setlocal foldmethod=marker
     au FileType javascript setlocal foldmarker={,}
-    au FileType javascript setlocal call MakeSpacelessBufferIabbrev('clog', 'console.log();<left><left>')
 
     " make the curson position properly when opening braces
     au FileType javascript inoremap <buffer> {<cr> {}<left><cr><space><space><space><space>.<cr><esc>kA<bs>
@@ -405,6 +398,11 @@ nmap <leader>x <Plug>ToggleAutoCloseMappings
 " }}}
 
 " }}}
+" bufferline {{{
+
+Plugin 'bling/vim-bufferline'
+
+" }}}
 " commentary | lets comment stuff out proper! {{{{{
 
 Plugin 'tpope/vim-commentary'
@@ -422,23 +420,29 @@ xmap <leader>c <Plug>Commentary
 " }}}
 
 " }}}
+" css3 {{{
+
+Plugin 'hail2u/vim-css3-syntax'
+
+" }}}
 " ctrlP | fuzzy search file opening {{{
 
 Plugin 'kien/ctrlp.vim'
 
+let g:ctrlp_map = '<c-p>'
 " order files top to bottom
 let g:ctrlp_match_window = 'bottom, order:ttb'
 " always open file in new buffer
-let g:ctrlp_switch_buffer = 0
+let g:ctrlp_switch_buffer = 1
 " if we change working directory in vim respect that
 let g:ctrlp_working_path_mode = 0
-" make ctrlp use ag to search (much quicker)
 let g:ctrlp_split_window = 0
 let g:ctrlp_max_height = 20
+" make ctrlp use ag to search (much quicker)
 let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
 
 nnoremap <leader>. :CtrlPTag<cr>
-nnoremap <leader>E :CtrlP ../
+nnoremap <c-P> :CtrlP<cr>
 
 let g:ctrlp_map = '<leader>,'
 
@@ -489,9 +493,39 @@ let g:microdata_attributes_complete = 0
 let g:atia_attributes_complete = 0
 
 " }}}
+" LESS {{{
+
+Plugin 'groenewege/vim-less'
+
+" }}}
 " MatchTagAlways | shows what HTML tags we are in {{{
 
 Plugin 'valloric/MatchTagAlways'
+
+" }}}
+" NerdTree " {{{
+
+Plugin 'scrooloose/nerdtree'
+
+noremap <C-n> :NERDTreeToggle<cr>
+inoremap <C-n> <esc>:NERDTreeToggle<cr>
+
+augroup ps_nerdtree
+    au!
+
+    au FileType nerdtree setlocal nolist
+    au FileType nerdtree nnoremap <buffer> H :vertical resize -10<cr>
+    au FileType nerdtree nnoremap <buffer> L :vertical resize +10<cr>
+augroup END
+
+let NERDTreeHighlightCursorline = 1
+let NERDTreeIgnore = ['.vim$', '\~$', '.*\.pyc$', 'pip-log\.txt$', '.*\.pdf$']
+
+let NERDTreeMinimalUi = 1
+let NERDTreeDirArrows = 1
+let NERDChristmasTree = 1
+let NERDTreeChDirMode = 2
+let NERDTreeMapJumpFirstChild = 'gK'
 
 " }}}
 " python-mode {{{
@@ -515,7 +549,8 @@ let g:pymode_options_indent = 0
 let g:pymode_rope = 1
 let g:pymode_rope_global_prefix = '<localleader>R'
 let g:pymode_rope_local_prefix = '<localleader>r'
-let g:pymode_rope_enable_autoimport = 0
+
+let g:pymode_rope_goto_definition_bind = '<leader>b'
 
 " }}}
 " scss-syntax | proper scss syntax highlighting {{{
@@ -564,6 +599,17 @@ call vundle#end() " required
 filetype plugin indent on " required
 
 " }}}
+
+" }}}
+
+" {{{ Theme (This after plugins so we can use Plugin themes)
+
+" we want syntax..
+syntax enable
+" we also prefer dark styles
+set background=dark
+" my current favourite theme atm
+colorscheme gruvbox
 
 " }}}
 
