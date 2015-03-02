@@ -39,9 +39,12 @@ augroup END
 " Mappings {{{
 
 " set leader to be the comma `,`
-let mapleader = ","
+let mapleader = "\<space>"
 " set the local map leader(?)
 let maplocalleader = "\\"
+
+" lets get into normal mode
+inoremap jj <esc>
 
 " unbind F1 help key
 noremap <F1> :checktime<cr>
@@ -51,6 +54,9 @@ inoremap <F1> <esc>:checktime<cr>
 noremap <leader>w :bd<cr>
 " buffer open
 noremap <leader>q :vert sb 
+
+" save file
+nnoremap <leader>w :w<cr>
 
 " }}}
 
@@ -95,6 +101,15 @@ augroup cline
 augroup END
 
 " }}}
+" Explorer {{{
+
+" Mappings {{{
+
+nnoremap <C-n> :Explore<cr> 
+
+" }}}
+
+" }}}
 " Folding {{{
 
 " we want to be able to fold
@@ -108,9 +123,8 @@ set foldmethod=indent
 
 " {{{ Mappings
 
-" define `,` to open and close folds
-nnoremap <space> za
-
+" open/close folds
+nnoremap <leader><space> za
 " focus current fold (aka close all others except current)
 nnoremap <leader>z zMzvzz
 
@@ -178,13 +192,21 @@ set gdefault
 " Mappings {{{
 
 " clear search highlights
-nnoremap <leader><space> :nohlsearch<CR>
+nnoremap <leader>, :nohlsearch<CR>
 " when going forward and back keep the line in the middle of the screen
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
 " open Quickfix window for the last search
 nnoremap <silent> <leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
+
+" able to repeat change after search:
+" search as usual /foo?bar!
+" hit cs to change the first word
+" hit n.n.n.n.n. to change as many as we need to
+vnoremap <silent> s //e<C-r>=&selection=='exclusive'?'+1':''<CR><CR>
+    \:<C-u>call histdel('search',-1)<Bar>let @/=histget('search',-1)<CR>gv
+omap s :normal vs<CR>
 
 " }}}
 
@@ -343,8 +365,6 @@ augroup END
 augroup ft_python
     au!
 
-    au FileType python setlocal define=^\s*\\(def|||||class\\)
-
     au FileType python if exists('python_space_error_highlight') | unlet python_space_error_highlight | endif
 augroup END
 
@@ -373,18 +393,22 @@ Plugin 'gmarik/Vundle.vim' " required
 
 Plugin 'bling/vim-airline'
 
+let g:airline_theme = 'base16'
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
+let g:airline_section_z = ''
+
 " }}}
 " ag | vim plugin for the silver searcher {{{
 
 Plugin 'rking/ag.vim'
 
+" Mappings {{{
+
+nnoremap <leader>a :Ag<space>
+nnoremap <leader>b :Ag <cword><cr>
+
 " }}}
-" ack | searchy stuff {{{
-
-Plugin 'mileszs/ack.vim'
-
-nnoremap <leader>a :Ack!<space>
-let g:ackprg = 'ag --smart-case --nogroup --nocolor --column'
 
 " }}}
 " autoclose | trigger autoclosing for certain characters {{{
@@ -439,12 +463,20 @@ let g:ctrlp_working_path_mode = 0
 let g:ctrlp_split_window = 0
 let g:ctrlp_max_height = 20
 " make ctrlp use ag to search (much quicker)
-let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+let g:ctrlp_use_caching = 0
+if executable('ag')
+    set grepprg=ag\ --nogroup\ --nocolor
+
+    let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+else
+    let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f']
+    let g:ctrlp_prompt_mappings = {
+                \ 'AcceptSelection("e")': ['<space>', '<cr>', '<2-LeftMouse>'],
+                \ }
+endif
 
 nnoremap <leader>. :CtrlPTag<cr>
 nnoremap <c-P> :CtrlP<cr>
-
-let g:ctrlp_map = '<leader>,'
 
 " }}}
 " easy align {{{
@@ -459,6 +491,33 @@ vmap <Enter> <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
 
 " }}}
+
+" }}}
+" expand region {{{
+
+Plugin 'terryma/vim-expand-region'
+
+" Mappings {{{
+
+vmap v <Plug>(expand_region_expand)
+vmap <C-v> <Plug>(expand_region_shrink)
+
+" }}}
+
+" }}}
+" git {{{
+
+Plugin 'tpope/vim-fugitive'
+
+" }}}
+" git gutter {{{
+
+Plugin 'airblade/vim-gitgutter'
+
+" }}}
+" gitignore {{{
+
+Plugin 'vim-scripts/gitignore'
 
 " }}}
 " gundo | sexy undo history {{{
@@ -501,31 +560,6 @@ Plugin 'groenewege/vim-less'
 " MatchTagAlways | shows what HTML tags we are in {{{
 
 Plugin 'valloric/MatchTagAlways'
-
-" }}}
-" NerdTree " {{{
-
-Plugin 'scrooloose/nerdtree'
-
-noremap <C-n> :NERDTreeToggle<cr>
-inoremap <C-n> <esc>:NERDTreeToggle<cr>
-
-augroup ps_nerdtree
-    au!
-
-    au FileType nerdtree setlocal nolist
-    au FileType nerdtree nnoremap <buffer> H :vertical resize -10<cr>
-    au FileType nerdtree nnoremap <buffer> L :vertical resize +10<cr>
-augroup END
-
-let NERDTreeHighlightCursorline = 1
-let NERDTreeIgnore = ['.vim$', '\~$', '.*\.pyc$', 'pip-log\.txt$', '.*\.pdf$']
-
-let NERDTreeMinimalUi = 1
-let NERDTreeDirArrows = 1
-let NERDChristmasTree = 1
-let NERDTreeChDirMode = 2
-let NERDTreeMapJumpFirstChild = 'gK'
 
 " }}}
 " python-mode {{{
@@ -571,6 +605,11 @@ Plugin 'ervandew/supertab'
 " surround {{{
 
 Plugin 'tpope/vim-surround'
+
+" }}}
+" targets | ci' to change between ' etc. {{{
+
+Plugin 'wellle/targets.vim'
 
 " }}}
 " vim-javascript {{{
