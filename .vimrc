@@ -27,6 +27,8 @@ set splitbelow
 set splitright
 set colorcolumn=+1
 
+set ruler
+
 " return to line open before last close
 augroup line_return
     au!
@@ -39,7 +41,7 @@ augroup END
 " Mappings {{{
 
 " set leader to be the comma `,`
-let mapleader = "\<space>"
+let mapleader = ","
 " set the local map leader(?)
 let maplocalleader = "\\"
 
@@ -55,9 +57,6 @@ noremap <leader>w :bd<cr>
 " buffer open
 noremap <leader>q :vert sb 
 
-" save file
-nnoremap <leader>w :w<cr>
-
 " }}}
 
 " }}}
@@ -71,6 +70,7 @@ set noswapfile
 
 " set backup directories
 set undodir=~/.vim/tmp/undo//
+set undofile
 set backupdir=~/.vim/tmp/backup//
 set directory=~/.vim/tmp/swap//
 
@@ -124,7 +124,7 @@ set foldmethod=indent
 " {{{ Mappings
 
 " open/close folds
-nnoremap <leader><space> za
+nnoremap <space> za
 " focus current fold (aka close all others except current)
 nnoremap <leader>z zMzvzz
 
@@ -192,7 +192,7 @@ set gdefault
 " Mappings {{{
 
 " clear search highlights
-nnoremap <leader>, :nohlsearch<CR>
+nnoremap <leader><space> :nohlsearch<CR>
 " when going forward and back keep the line in the middle of the screen
 nnoremap n nzzzv
 nnoremap N Nzzzv
@@ -257,6 +257,8 @@ set wildignore+=.jpg,*.bmp,*.gif,*.png,*.jpeg
 set wildignore+=*.DS_STORE
 set wildignore+=*.pyc
 set wildignore+=*.sass-cache
+
+let g:netrw_list_hide= '.*\.pyc$'
 
 " }}}
 " Whitespace {{{
@@ -451,29 +453,61 @@ Plugin 'hail2u/vim-css3-syntax'
 " }}}
 " ctrlP | fuzzy search file opening {{{
 
-Plugin 'kien/ctrlp.vim'
+" let g:ctrlp_dont_split = 'NERD_tree_2'
+" let g:ctrlp_jump_to_buffer = 0
+" let g:ctrlp_working_path_mode = 0
+" let g:ctrlp_match_window_reversed = 1
+" let g:ctrlp_split_window = 0
+" let g:ctrlp_max_height = 20
+" let g:ctrlp_extensions = ['tag']
+
+" let g:ctrlp_map = '<leader>,'
+" nnoremap <leader>. :CtrlPTag<cr>
+" nnoremap <leader>E :CtrlP ../
+
+" let g:ctrlp_prompt_mappings = {
+" \ 'PrtSelectMove("j")':   ['<c-j>', '<down>', '<s-tab>'],
+" \ 'PrtSelectMove("k")':   ['<c-k>', '<up>', '<tab>'],
+" \ 'PrtHistory(-1)':       ['<c-n>'],
+" \ 'PrtHistory(1)':        ['<c-p>'],
+" \ 'ToggleFocus()':        ['<c-tab>'],
+" \ }
+
+" let ctrlp_filter_greps = "".
+"     \ "egrep -iv '\\.(" .
+"     \ "jar|class|swp|swo|log|so|o|pyc|jpe?g|png|gif|mo|po" .
+"     \ ")$' | " .
+"     \ "egrep -v '^(\\./)?(" .
+"     \ "deploy/|lib/|classes/|libs/|deploy/vendor/|.git/|.hg/|.svn/|.*migrations/|docs/build/" .
+"     \ ")'"
+
+" let my_ctrlp_user_command = "" .
+"     \ "find %s '(' -type f -or -type l ')' -maxdepth 15 -not -path '*/\\.*/*' | " .
+"     \ ctrlp_filter_greps
+
+" let my_ctrlp_git_command = "" .
+"     \ "cd %s && git ls-files --exclude-standard -co | " .
+"     \ ctrlp_filter_greps
+
+" let my_ctrlp_ffind_command = "ffind --semi-restricted --dir %s --type e -B -f"
+
+" let g:ctrlp_user_command = ['.git', my_ctrlp_ffind_command, my_ctrlp_ffind_command]
+
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'Shougo/unite.vim'
 
 let g:ctrlp_map = '<c-p>'
-" order files top to bottom
-let g:ctrlp_match_window = 'bottom, order:ttb'
 " always open file in new buffer
-let g:ctrlp_switch_buffer = 1
-" if we change working directory in vim respect that
-let g:ctrlp_working_path_mode = 0
 let g:ctrlp_split_window = 0
 let g:ctrlp_max_height = 20
-" make ctrlp use ag to search (much quicker)
 let g:ctrlp_use_caching = 0
-if executable('ag')
-    set grepprg=ag\ --nogroup\ --nocolor
+let g:ctrlp_working_path_mode = 'rw'
+let g:ctrlp_max_files = 100000000
 
-    let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-else
-    let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f']
-    let g:ctrlp_prompt_mappings = {
-                \ 'AcceptSelection("e")': ['<space>', '<cr>', '<2-LeftMouse>'],
-                \ }
-endif
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f']
+let g:ctrlp_prompt_mappings = {
+            \ 'AcceptSelection("e")': ['<space>', '<cr>', '<2-LeftMouse>'],
+            \ }
 
 nnoremap <leader>. :CtrlPTag<cr>
 nnoremap <c-P> :CtrlP<cr>
@@ -491,6 +525,13 @@ vmap <Enter> <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
 
 " }}}
+
+" }}}
+" emmet {{{
+
+Plugin 'mattn/emmet-vim'
+
+let g:user_emmet_leader_key = '<C-e>'
 
 " }}}
 " expand region {{{
@@ -513,11 +554,6 @@ Plugin 'tpope/vim-fugitive'
 " git gutter {{{
 
 Plugin 'airblade/vim-gitgutter'
-
-" }}}
-" gitignore {{{
-
-Plugin 'vim-scripts/gitignore'
 
 " }}}
 " gundo | sexy undo history {{{
@@ -586,6 +622,10 @@ let g:pymode_rope_local_prefix = '<localleader>r'
 
 let g:pymode_rope_goto_definition_bind = '<leader>b'
 
+let g:pymode_rope_autoimport = 0
+
+let g:pymode_lint_ignore = "E501"
+
 " }}}
 " scss-syntax | proper scss syntax highlighting {{{
 
@@ -597,14 +637,28 @@ Plugin 'cakebaker/scss-syntax.vim'
 Plugin 'AndrewRadev/splitjoin.vim'
 
 " }}}
-" supertab | helps with autocompletions! {{{
-
-Plugin 'ervandew/supertab'
-
-" }}}
 " surround {{{
 
 Plugin 'tpope/vim-surround'
+
+" }}}
+" Syntastic {{{
+
+Plugin 'scrooloose/syntastic'
+
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+
+" Mappings {{{
+
+nnoremap <leader>C :SyntasticCheck<cr>
+
+" }}}
 
 " }}}
 " targets | ci' to change between ' etc. {{{
@@ -649,6 +703,8 @@ syntax enable
 set background=dark
 " my current favourite theme atm
 colorscheme gruvbox
+
+set guifont=DejaVu\ Sans\ Mono:12
 
 " }}}
 
