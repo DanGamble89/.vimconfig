@@ -598,6 +598,11 @@ Plugin 'groenewege/vim-less'
 Plugin 'valloric/MatchTagAlways'
 
 " }}}
+" multiple cursors {{{
+
+Plugin 'terryma/vim-multiple-cursors'
+
+" }}}
 " python-mode {{{
 
 Plugin 'klen/python-mode'
