@@ -1,221 +1,718 @@
-" Dan Gamble
-" Misc {{{
+" don't want compatibility with Vi  
 set nocompatible
+
+" Vim {{{
+
+" set encoding
 set encoding=utf-8
+" make vim check the last line for file specific settings
 set modelines=1
-filetype off
-
-" indent
-set ai
-set si
-
-" status bar
-set laststatus=2
-
-" make yanks go to system clipboard
-set clipboard=unnamed
-
-" make Vim read files on external change (Git merge, etc.)
+" change file to match external changes (i.e after a git merge)
 set autoread
-
-set backspace=indent,eol,start
-set cursorline
-set expandtab
-set lazyredraw
-set nowrap
-set number
-set ruler
-set showmode
+" yanks go to the clipboard
+set clipboard=unnamed
+" show command in the bottom bar
 set showcmd
+" redrawn(?) only when we need to. Improves performance
+set lazyredraw
+" show matching braces, brackets etc.
 set showmatch
-set colorcolumn=80
-set softtabstop=4 tabstop=4 shiftwidth=4
-set wildmenu
-set wrap
+set matchtime=3 " match for 3s(?)
+" show status bar
+set laststatus=2
+" get vim to autoindent based on file indentation, hopefully...
+set smartindent
+" set defaults for split panes
+set splitbelow
+set splitright
+set colorcolumn=+1
+
+set ruler
+
+" return to line open before last close
+augroup line_return
+    au!
+    au BufReadPost *
+        \ if line("'\"") > 9 && line("'\"") <= line("$") |
+        \     execute 'normal! g`"zvzz' |
+        \ endif
+augroup END
+
+" Mappings {{{
+
+" set leader to be the comma `,`
+let mapleader = ","
+" set the local map leader(?)
+let maplocalleader = "\\"
+
+" lets get into normal mode
+inoremap jj <esc>
+
+" unbind F1 help key
+noremap <F1> :checktime<cr>
+inoremap <F1> <esc>:checktime<cr>
+
+" buffer close
+noremap <leader>w :bd<cr>
+" buffer open
+noremap <leader>q :vert sb 
+
 " }}}
-" Searching {{{
-set nohlsearch
-set incsearch
-set ignorecase
-set smartcase
+
+" }}}
+
+" Backups {{{
+
+" enable backups
+set backup
+" we don't want the swp file
+set noswapfile
+
+" set backup directories
+set undodir=~/.vim/tmp/undo//
+set undofile
+set backupdir=~/.vim/tmp/backup//
+set directory=~/.vim/tmp/swap//
+
+" lets make the above folders if they don't exist
+if !isdirectory(expand(&undodir))
+        call mkdir(expand(&undodir), 'p')
+endif
+if !isdirectory(expand(&backupdir))
+        call mkdir(expand(&backupdir), 'p')
+endif
+if !isdirectory(expand(&directory))
+        call mkdir(expand(&directory), 'p')
+endif
+
+" }}}
+" Completion {{{
+
+set complete=.,w,b,u,t
+set completeopt=longest,menuone,preview
+
+" }}}
+" Cursorline {{{
+
+augroup cline
+    au!
+    au WinLeave,InsertEnter * set nocursorline
+    au WinEnter,InsertLeave * set cursorline
+augroup END
+
+" }}}
+" Explorer {{{
+
+" Mappings {{{
+
+nnoremap <C-n> :Explore<cr> 
+
+" }}}
+
 " }}}
 " Folding {{{
+
+" we want to be able to fold
 set foldenable
+" open most folds by default
 set foldlevelstart=10
+" nested fold max level
 set foldnestmax=10
+" fold method
 set foldmethod=indent
+
+" {{{ Mappings
+
+" open/close folds
 nnoremap <space> za
-nnoremap <leader><space> :nohlsearch<CR>
-" }}}
-" Vundle {{{
-" Set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" Alternatively, pass a apath where Vundle should install plugins
-" call vundle#begin('~/some/path/here')
+" focus current fold (aka close all others except current)
+nnoremap <leader>z zMzvzz
 
-" Let Vundle manage Vundle
-Plugin 'gmarik/Vundle.vim'
-Plugin 'tpope/vim-fugitive.git'
-Plugin 'https://github.com/vim-scripts/ScrollColors'
-Plugin 'kien/ctrlp.vim'
-Plugin 'ervandew/supertab'
-Plugin 'scrooloose/syntastic'
-Plugin 'mattn/emmet-vim'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'mileszs/ack.vim'
-Plugin 'rking/ag.vim'
-Plugin 'tpope/vim-surround'
-Plugin 'hynek/vim-python-pep8-indent'
-Plugin 'davidhalter/jedi-vim'
-Plugin 'mjbrownie/vim-htmldjango_omnicomplete'
-Plugin 'jmcantrell/vim-virtualenv'
-Plugin 'cwood/vim-django'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'valloric/MatchTagAlways'
-Plugin 'cakebaker/scss-syntax.vim'
-Plugin 'airblade/vim-rooter'
-Plugin 'othree/xml.vim'
-Plugin 'bling/vim-airline'
+" }}}
 
-" The follow are examples of different formats supported
-" Keep Plugin commands between vundle#begin/end
+" }}}
+" Line {{{
 
-" All of my plugins must be added before the following line
-call vundle#end()
-filetype plugin indent on
-" }}}
-" Color / Theme {{{
-syntax enable
-set background=dark
-colorscheme gruvbox
-" }}}
-" Leader {{{
-let mapleader=","
-" }}}
-" Autocmd {{{
-autocmd FileType python set sw=4
-autocmd FileType python set ts=4
-autocmd FileType python set sts=4
+" set numbers to be relative to current line
+set relativenumber
+" turn on line numbers, we do this after relativenumber so the current line
+" has it's number
+set number
+" highlight current line
+set cursorline
 
-" Set cursor based on different mode
-:autocmd InsertEnter, InsertLeave * set cul!
+" }}}
+" Movement {{{
 
-au BufNewFile,BufRead *.html set filetype=htmldjango
-" }}}
-" CtrlP {{{
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_working_path_mode = 0
-let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-let g:ctrlp_follow_symlinks = 1
-map <C-a> :Ack<CR>
-" }}}
-" Django-vim {{{
-let g:django_projects = '~/Workspace' "Sets all projects under project
-let g:django_activate_virtualenv = 1 "Try to activate the associated virtualenv
-" }}}
-" Emmet {{{
-let g:user_emmet_mode = "a"
-let g:user_emmet_expandabbr_key='<Tab>'
-imap <expr> <tab> emmet#expandAbbrIntelligent("\<tab>")
-" }}}
-" Syntastic {{{
-let g:syntastic_check_on_open = 1
-let g:syntastic_python_flake8_post_args='--ignore=E501,E128'
-" }}}
-" Airline {{{
-let g:airline#extensions#tabline#enabled = 1
-" }}}
-" Auto complete {{{
-"--ENABLE PYTHON/DJANGO OMNICOMPLETE
+" fix vim backspace
+set backspace=indent,eol,start
 
-set omnifunc=syntaxcomplete#Complete
-" autocmd FileType python set omnifunc=pythoncomplete#Complete
-autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
-autocmd FileType css set omnifunc=csscomplete#CompleteCSS
-au FileType htmldjango set omnifunc=htmldjangocomplete#CompleteDjango
+" Mappings {{{
 
-"--SuperTab Integration
-set completeopt-=previewtj
-let g:SuperTabDefaultCompletionType = ""
-let g:SuperTabDefaultCompletionType = "context"
-" }}}
-" Custom binds {{{
+" move vertically by visual line (won't skip wrapped lines)
+nnoremap j gj
+nnoremap k gk
+
+" move to the beginning and end of line
+nnoremap B ^
+nnoremap E $
+" make sure the old keybinds for these do diddly
+nnoremap $ <nop>
+nnoremap ^ <nop>
+
+" highlight last inserted text
 nnoremap gV `[v`]
 
-" Move to beginning/end of line
-nnoremap £ ^
+" enter normal mode aka do <esc>
+inoremap jk <esc>
 
-" Move back and forward when searching etc.
-" nnoremap * d
-" nnoremap # a
+" delete to end of line
+nnoremap D d$
 
-" Make sure the old binds don't do anything
-nnoremap ^ <nop>
-" nnoremap * <nop>
-" nnoremap # <nop>
-
-" Number setting based on mode
-autocmd InsertEnter * :set number
-autocmd InsertLeave * :set relativenumber
-
-" Ag
-nnoremap <leader>a :Ag
+" go to beginning and end of line in insert mode
+inoremap <c-a> <esc>I
+inoremap <c-e> <esc>A
 
 " }}}
-" Backups {{{
-set backup
-set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-set backupskip=/tmp/*,/private/tmp/*
-set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-set writebackup
+
 " }}}
-" Custom functions {{{
-function! StripTrailingWhitespaces()
-    let _s=@/
-    let l = line(".")
-    let c = col(".")
-    %s/\s\+$//e
-    let @/=_s
-    call cursor(l, c)
-endfunction
+" Searching {{{
 
-function! HasPaste()
-    if &paste
-        return 'PASTE MODE  '
-    en
-    return ''
-endfunction
+" search as characters are entered
+set incsearch
+" highlight matches
+set hlsearch
+" ignore case sensitivity
+set ignorecase
+" we want smartcase though
+set smartcase
+" replace on line by default
+set gdefault
+
+" Mappings {{{
+
+" clear search highlights
+nnoremap <leader><space> :nohlsearch<CR>
+" when going forward and back keep the line in the middle of the screen
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" open Quickfix window for the last search
+nnoremap <silent> <leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
+
+" able to repeat change after search:
+" search as usual /foo?bar!
+" hit cs to change the first word
+" hit n.n.n.n.n. to change as many as we need to
+vnoremap <silent> s //e<C-r>=&selection=='exclusive'?'+1':''<CR><CR>
+    \:<C-u>call histdel('search',-1)<Bar>let @/=histget('search',-1)<CR>gv
+omap s :normal vs<CR>
+
 " }}}
 
-" ~/.vimrc file:
-if filereadable($VIRTUAL_ENV . '/.vimrc')
-    source $VIRTUAL_ENV/.vimrc
-endif
+" }}}
+" System + Shortcuts to common files i.e .vimrc, .zshrc {{{
 
-" add the ability to create files in Vim using `:E`
-command -nargs=1 E execute('silent! !mkdir -p "$(dirname "<args>")"') <Bar> e <args>
+" Mappings {{{ 
 
-if exists("+relativenumber")
-    " Due to a problem with relative line numbers not persisting across new
-    " tabs and splits, set no line numbers at all...
-    set nonumber
-    " ..then set relative ones.
-    set relativenumber
-else
-    set number
-endif
+" .vimrc
+nnoremap <leader>ev :vsp $MYVIMRC<CR>
+" .zshrc
+nnoremap <leader>ez :vsp ~/.zshrc<CR>
+" source vimrc
+nnoremap <leader>sv :source $MYVIMRC<CR>
 
-" Change cursor based on mode (iTerm only)
-if exists('$ITERM_PROFILE')
-    if exists('$TMUX')
-        let &t_SI = "\<Esc>[3 q"
-        let &t_EI = "\<Esc>[0 q"
-    else
-        let &t_SI = "\<Esc>]50;CursorShape=1\x7"
-        let &t_EI = "\<Esc>]50;CursorShape=0\x7"
-    endif
-end
+" }}}
 
+" }}}
+" {{{ Tabs
+
+" number of visual spaces per tab
+set tabstop=4
+" number of spaces in tab when editing
+set softtabstop=4
+" come on now, tabs are spaces..
+set expandtab
+" set indent to use multiple of shiftwidth
+set shiftwidth=4
+set shiftround
+
+" }}}
+" Terminal specific settings {{{
+
+" time out on key codes but not mappinhs
+set notimeout
+set ttimeout
+set timeoutlen=10
+
+" }}}
+" Wildmenu {{{
+
+" visual autocomplete for command menu
+set wildmenu
+set wildmode=list:longest
+" add some things to ignore
+set wildignore+=.hg,.git,.svn
+set wildignore+=.jpg,*.bmp,*.gif,*.png,*.jpeg
+set wildignore+=*.DS_STORE
+set wildignore+=*.pyc
+set wildignore+=*.sass-cache
+
+let g:netrw_list_hide= '.*\.pyc$'
+
+" }}}
+" Whitespace {{{
+
+" show white space
+set list
+set listchars=tab:▸\ ,extends:❯,precedes:❮
+
+" only show whitespace when not in insert mode
+augroup trailing
+    au!
+    au InsertEnter * :set listchars-=trail:⌴
+    au InsertLeave * :set listchars+=trail:⌴
+augroup END
+
+" }}}
+
+" File specific {{{
+
+" CSS {{{
+
+augroup ft_css
+    au!
+
+    au BufNewFile,BufRead *.less setlocal filetype=less
+    au BufNewFile,BufRead *.scss setlocal filetype=scss
+
+    au Filetype less,scss,css setlocal foldmethod=marker
+    au Filetype less,scss,css setlocal foldmarker={,}
+    au FileType less,scss,css setlocal omnifunc=csscomplete#CompleteCSS
+    au FileType less,scss,css setlocal iskeyword+=-
+
+    " make the curson position properly when opening braces
+    au BufNewFile,BufRead *.less,*.scss,*.css inoremap <buffer> {<cr> {}<left><cr><space><space><space><space>.<cr><esc>kA<bs>
+    " }
+augroup END
+
+" }}}
+" Django {{{
+
+augroup ft_django
+    au!
+
+    au BufNewFile,BufRead urls.py         setlocal nowrap
+    au BufNewFile,BufRead urls.py         normal! zR
+    au BufNewFile,BufRead dashboard.py    normal! zR
+    au BufNewFile,BufRead local.py        normal! zR
+
+    au BufNewFile,BufRead admin.py        setlocal filetype=python.django
+    au BufNewFile,BufRead urls.py         setlocal filetype=python.django
+    au BufNewFile,BufRead models.py       setlocal filetype=python.django
+    au BufNewFile,BufRead views.py        setlocal filetype=python.django
+    au BufNewFile,BufRead settings.py     setlocal filetype=python.django
+    au BufNewFile,BufRead settings.py     setlocal foldmethod=marker
+    au BufNewFile,BufRead forms.py        setlocal filetype=python.django
+augroup END
+
+" }}}
+" HTML, Django, Jinga {{{
+
+augroup ft_html
+    au!
+
+    au BufNewFile,BufRead *.html setlocal filetype=htmldjango
+
+    au FileType html,jinja,htmldjango setlocal foldmethod=manual
+
+    " use localleader to fold current tag
+    au FileType html,jinja,htmldjango nnoremap <buffer> <localleader>f Vatzf
+
+    " use localleader to fold the current templatetag
+    au FileType html,jinja,htmldjango nmap <buffer> <localleader>t viikojozf
+
+    " indent tag
+    au FileType html,jinja,htmldjango nnoremap <buffer> <localleader>= Vat=
+
+    " django tags
+    au FileType jinja,htmldjango inoremap <buffer> <c-t> {%<space><space>%}<left><left><left>
+
+    " django variables
+    au FileType jinja,htmldjango inoremap <buffer> <c-b> {{<space><space>}}<left><left><left>
+augroup END
+
+" }}}
+" Javascript {{{
+
+augroup ft_javascript
+    au!
+
+    au FileType javascript setlocal foldmethod=marker
+    au FileType javascript setlocal foldmarker={,}
+
+    " make the curson position properly when opening braces
+    au FileType javascript inoremap <buffer> {<cr> {}<left><cr><space><space><space><space>.<cr><esc>kA<bs>
+    " }
+
+    " prettyify dat json
+    au FileType javascript nnoremap <buffer> <localleader>p Bvg_:!python -m json.tool<cr>
+    au FileType javascript vnoremap <buffer> <localleader>p :!python -m jston.tool<cr>
+
+augroup END
+
+" }}}
+" Python {{{
+
+augroup ft_python
+    au!
+
+    au FileType python if exists('python_space_error_highlight') | unlet python_space_error_highlight | endif
+augroup END
+
+" }}}
+
+" }}}
+
+" Plugins (Vundle) {{{
+
+" Before plugins {{{
+
+" required for Vundle
+filetype off
+
+" set the runtime path to invlude Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim "requied
+call vundle#begin() " required
+
+" let Vundle manage Vundle
+Plugin 'gmarik/Vundle.vim' " required
+
+" }}}
+" list of other plugins {{{
+
+" airline | adds a super sext status bar {{{
+
+Plugin 'bling/vim-airline'
+
+let g:airline_theme = 'base16'
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
+let g:airline_section_z = ''
+
+" }}}
+" ag | vim plugin for the silver searcher {{{
+
+Plugin 'rking/ag.vim'
+
+" Mappings {{{
+
+nnoremap <leader>a :Ag<space>
+nnoremap <leader>b :Ag <cword><cr>
+
+" }}}
+
+" }}}
+" autoclose | trigger autoclosing for certain characters {{{
+
+Plugin 'Townk/vim-autoclose'
+
+" Mappings {{{
+
+nmap <leader>x <Plug>ToggleAutoCloseMappings
+
+" }}}
+
+" }}}
+" bufferline {{{
+
+Plugin 'bling/vim-bufferline'
+
+" }}}
+" commentary | lets comment stuff out proper! {{{{{
+
+Plugin 'tpope/vim-commentary'
+
+augroup plugin_commentary
+    au!
+    au FileType htmldjango setlocal commentstring={#\ %s\ #}
+augroup END
+
+" Mappings {{{
+
+nmap <leader>c <Plug>CommentaryLine
+xmap <leader>c <Plug>Commentary
+
+" }}}
+
+" }}}
+" css3 {{{
+
+Plugin 'hail2u/vim-css3-syntax'
+
+" }}}
+" ctrlP | fuzzy search file opening {{{
+
+" let g:ctrlp_dont_split = 'NERD_tree_2'
+" let g:ctrlp_jump_to_buffer = 0
+" let g:ctrlp_working_path_mode = 0
+" let g:ctrlp_match_window_reversed = 1
+" let g:ctrlp_split_window = 0
+" let g:ctrlp_max_height = 20
+" let g:ctrlp_extensions = ['tag']
+
+" let g:ctrlp_map = '<leader>,'
+" nnoremap <leader>. :CtrlPTag<cr>
+" nnoremap <leader>E :CtrlP ../
+
+" let g:ctrlp_prompt_mappings = {
+" \ 'PrtSelectMove("j")':   ['<c-j>', '<down>', '<s-tab>'],
+" \ 'PrtSelectMove("k")':   ['<c-k>', '<up>', '<tab>'],
+" \ 'PrtHistory(-1)':       ['<c-n>'],
+" \ 'PrtHistory(1)':        ['<c-p>'],
+" \ 'ToggleFocus()':        ['<c-tab>'],
+" \ }
+
+" let ctrlp_filter_greps = "".
+"     \ "egrep -iv '\\.(" .
+"     \ "jar|class|swp|swo|log|so|o|pyc|jpe?g|png|gif|mo|po" .
+"     \ ")$' | " .
+"     \ "egrep -v '^(\\./)?(" .
+"     \ "deploy/|lib/|classes/|libs/|deploy/vendor/|.git/|.hg/|.svn/|.*migrations/|docs/build/" .
+"     \ ")'"
+
+" let my_ctrlp_user_command = "" .
+"     \ "find %s '(' -type f -or -type l ')' -maxdepth 15 -not -path '*/\\.*/*' | " .
+"     \ ctrlp_filter_greps
+
+" let my_ctrlp_git_command = "" .
+"     \ "cd %s && git ls-files --exclude-standard -co | " .
+"     \ ctrlp_filter_greps
+
+" let my_ctrlp_ffind_command = "ffind --semi-restricted --dir %s --type e -B -f"
+
+" let g:ctrlp_user_command = ['.git', my_ctrlp_ffind_command, my_ctrlp_ffind_command]
+
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'Shougo/unite.vim'
+
+let g:ctrlp_map = '<c-p>'
+" always open file in new buffer
+let g:ctrlp_split_window = 0
+let g:ctrlp_max_height = 20
+let g:ctrlp_use_caching = 0
+let g:ctrlp_working_path_mode = 'rw'
+let g:ctrlp_max_files = 100000000
+
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f']
+let g:ctrlp_prompt_mappings = {
+            \ 'AcceptSelection("e")': ['<space>', '<cr>', '<2-LeftMouse>'],
+            \ }
+
+nnoremap <leader>. :CtrlPTag<cr>
+nnoremap <c-P> :CtrlP<cr>
+
+" }}}
+" easy align {{{
+
+Plugin 'junegunn/vim-easy-align'
+
+" Mappings {{{
+
+" start interactive EasyAlign in visualmode (e.g vip<Enter>)
+vmap <Enter> <Plug>(EasyAlign)
+" start interactive EasyAlign for a motion/text object (e.g gaip)
+nmap ga <Plug>(EasyAlign)
+
+" }}}
+
+" }}}
+" emmet {{{
+
+Plugin 'mattn/emmet-vim'
+
+let g:user_emmet_leader_key = '<C-e>'
+
+" }}}
+" expand region {{{
+
+Plugin 'terryma/vim-expand-region'
+
+" Mappings {{{
+
+" vmap v <Plug>(expand_region_expand)
+" vmap <C-v> <Plug>(expand_region_shrink)
+
+" }}}
+
+" }}}
+" git {{{
+
+Plugin 'tpope/vim-fugitive'
+
+" }}}
+" git gutter {{{
+
+Plugin 'airblade/vim-gitgutter'
+
+" }}}
+" gundo | sexy undo history {{{
+
+Plugin 'sjl/gundo.vim'
+
+let g:gundo_debug = 1
+let g:gundo_preview_bottom = 1
+let g:gundo_tree_statusline = "Gundo"
+let g:gundo_preview_statusline = "Gundo Preview"
+
+" Mappings {{{
+
+" toggle gundo
+nnoremap <leader>u :GundoToggle<CR>
+
+" }}}
+
+" }}}
+" indentLine {{{
+
+Plugin 'Yggdroot/indentLine'
+
+" }}}
+" HTML5 {{{
+
+Plugin 'othree/html5.vim'
+
+let g:event_handler_attributes_complete = 0
+let g:rdfa_attributes_complete = 0
+let g:microdata_attributes_complete = 0
+let g:atia_attributes_complete = 0
+
+" }}}
+" LESS {{{
+
+Plugin 'groenewege/vim-less'
+
+" }}}
+" MatchTagAlways | shows what HTML tags we are in {{{
+
+Plugin 'valloric/MatchTagAlways'
+
+" }}}
+" multiple cursors {{{
+
+Plugin 'terryma/vim-multiple-cursors'
+
+" }}}
+" python-mode {{{
+
+Plugin 'klen/python-mode'
+
+let g:pymode_doc = 1
+let g:pymode_doc_key = 'M'
+let g:pydoc = 'pydoc'
+let g:pymode_syntax = 1
+let g:pymode_syntax_all = 0
+let g:pymode_syntax_builtin_objs = 1
+let g:pymode_syntax_print_as_function = 0
+let g:pymode_syntax_space_errors = 0
+
+let g:pymode_run = 0
+let g:pymode_breakpoint = 0
+
+let g:pymode_options_indent = 0
+
+let g:pymode_rope = 1
+let g:pymode_rope_global_prefix = '<localleader>R'
+let g:pymode_rope_local_prefix = '<localleader>r'
+
+let g:pymode_rope_goto_definition_bind = '<leader>b'
+
+let g:pymode_rope_autoimport = 0
+
+let g:pymode_lint_ignore = "E501"
+
+" }}}
+" scss-syntax | proper scss syntax highlighting {{{
+
+Plugin 'cakebaker/scss-syntax.vim'
+
+" }}}
+" splitjoin {{{
+
+Plugin 'AndrewRadev/splitjoin.vim'
+
+" }}}
+" surround {{{
+
+Plugin 'tpope/vim-surround'
+
+" }}}
+" Syntastic {{{
+
+Plugin 'scrooloose/syntastic'
+
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+
+" Mappings {{{
+
+nnoremap <leader>C :SyntasticCheck<cr>
+
+" }}}
+
+" }}}
+" targets | ci' to change between ' etc. {{{
+
+Plugin 'wellle/targets.vim'
+
+" }}}
+" vim-javascript {{{
+
+Plugin 'pangloss/vim-javascript'
+
+" }}}
+" xml.vim | helps refactor html tags {{{
+
+Plugin 'othree/xml.vim'
+
+" }}}
+
+" Colors / themes {{{
+
+Plugin 'whatyouhide/vim-gotham'
+Plugin 'morhetz/gruvbox'
+
+" }}}
+
+" }}}
+" After plugins {{{
+
+" all plugins must be before this line
+call vundle#end() " required
+filetype plugin indent on " required
+
+" }}}
+
+" }}}
+
+" {{{ Theme (This after plugins so we can use Plugin themes)
+
+" we want syntax..
+syntax enable
+" we also prefer dark styles
+set background=dark
+" my current favourite theme atm
+colorscheme gruvbox
+
+set guifont=DejaVu\ Sans\ Mono:12
+
+" }}}
+
+" specifics to .vimrc
+" #-- Make sure foldings are markers and are all collapsed by default
 " vim:foldmethod=marker:foldlevel=0
