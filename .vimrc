@@ -3,26 +3,16 @@ set nocompatible
 
 " Vim {{{
 
-" set encoding
 set encoding=utf-8
-" make vim check the last line for file specific settings
 set modelines=1
-" change file to match external changes (i.e after a git merge)
 set autoread
-" yanks go to the clipboard
 set clipboard=unnamed
-" show command in the bottom bar
 set showcmd
-" redrawn(?) only when we need to. Improves performance
 set lazyredraw
-" show matching braces, brackets etc.
 set showmatch
 set matchtime=3 " match for 3s(?)
-" show status bar
 set laststatus=2
-" get vim to autoindent based on file indentation, hopefully...
 set smartindent
-" set defaults for split panes
 set splitbelow
 set splitright
 set colorcolumn=+1
@@ -32,6 +22,7 @@ set ruler
 " return to line open before last close
 augroup line_return
     au!
+
     au BufReadPost *
         \ if line("'\"") > 9 && line("'\"") <= line("$") |
         \     execute 'normal! g`"zvzz' |
@@ -124,7 +115,7 @@ set foldmethod=indent
 " {{{ Mappings
 
 " open/close folds
-nnoremap <space> za
+nnoremap <leader><space> za
 " focus current fold (aka close all others except current)
 nnoremap <leader>z zMzvzz
 
@@ -192,7 +183,7 @@ set gdefault
 " Mappings {{{
 
 " clear search highlights
-nnoremap <leader><space> :nohlsearch<CR>
+nnoremap <leader>, :nohlsearch<CR>
 " when going forward and back keep the line in the middle of the screen
 nnoremap n nzzzv
 nnoremap N Nzzzv
@@ -453,46 +444,6 @@ Plugin 'hail2u/vim-css3-syntax'
 " }}}
 " ctrlP | fuzzy search file opening {{{
 
-" let g:ctrlp_dont_split = 'NERD_tree_2'
-" let g:ctrlp_jump_to_buffer = 0
-" let g:ctrlp_working_path_mode = 0
-" let g:ctrlp_match_window_reversed = 1
-" let g:ctrlp_split_window = 0
-" let g:ctrlp_max_height = 20
-" let g:ctrlp_extensions = ['tag']
-
-" let g:ctrlp_map = '<leader>,'
-" nnoremap <leader>. :CtrlPTag<cr>
-" nnoremap <leader>E :CtrlP ../
-
-" let g:ctrlp_prompt_mappings = {
-" \ 'PrtSelectMove("j")':   ['<c-j>', '<down>', '<s-tab>'],
-" \ 'PrtSelectMove("k")':   ['<c-k>', '<up>', '<tab>'],
-" \ 'PrtHistory(-1)':       ['<c-n>'],
-" \ 'PrtHistory(1)':        ['<c-p>'],
-" \ 'ToggleFocus()':        ['<c-tab>'],
-" \ }
-
-" let ctrlp_filter_greps = "".
-"     \ "egrep -iv '\\.(" .
-"     \ "jar|class|swp|swo|log|so|o|pyc|jpe?g|png|gif|mo|po" .
-"     \ ")$' | " .
-"     \ "egrep -v '^(\\./)?(" .
-"     \ "deploy/|lib/|classes/|libs/|deploy/vendor/|.git/|.hg/|.svn/|.*migrations/|docs/build/" .
-"     \ ")'"
-
-" let my_ctrlp_user_command = "" .
-"     \ "find %s '(' -type f -or -type l ')' -maxdepth 15 -not -path '*/\\.*/*' | " .
-"     \ ctrlp_filter_greps
-
-" let my_ctrlp_git_command = "" .
-"     \ "cd %s && git ls-files --exclude-standard -co | " .
-"     \ ctrlp_filter_greps
-
-" let my_ctrlp_ffind_command = "ffind --semi-restricted --dir %s --type e -B -f"
-
-" let g:ctrlp_user_command = ['.git', my_ctrlp_ffind_command, my_ctrlp_ffind_command]
-
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'Shougo/unite.vim'
 
@@ -532,18 +483,6 @@ nmap ga <Plug>(EasyAlign)
 Plugin 'mattn/emmet-vim'
 
 let g:user_emmet_leader_key = '<C-e>'
-
-" }}}
-" expand region {{{
-
-Plugin 'terryma/vim-expand-region'
-
-" Mappings {{{
-
-" vmap v <Plug>(expand_region_expand)
-" vmap <C-v> <Plug>(expand_region_shrink)
-
-" }}}
 
 " }}}
 " git {{{
@@ -596,11 +535,6 @@ Plugin 'groenewege/vim-less'
 " MatchTagAlways | shows what HTML tags we are in {{{
 
 Plugin 'valloric/MatchTagAlways'
-
-" }}}
-" multiple cursors {{{
-
-Plugin 'terryma/vim-multiple-cursors'
 
 " }}}
 " python-mode {{{
@@ -674,11 +608,6 @@ Plugin 'wellle/targets.vim'
 " vim-javascript {{{
 
 Plugin 'pangloss/vim-javascript'
-
-" }}}
-" xml.vim | helps refactor html tags {{{
-
-Plugin 'othree/xml.vim'
 
 " }}}
 
