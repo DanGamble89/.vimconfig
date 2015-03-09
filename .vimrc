@@ -46,7 +46,7 @@ let mapleader = ","
 let maplocalleader = "\\"
 
 " lets get into normal mode
-inoremap jj <esc>
+inoremap jk <esc>
 
 " unbind F1 help key
 noremap <F1> :checktime<cr>
@@ -444,7 +444,6 @@ Plugin 'hail2u/vim-css3-syntax'
 " ctrlP | fuzzy search file opening {{{
 
 Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'Shougo/unite.vim'
 
 let g:ctrlp_map = '<c-p>'
 " always open file in new buffer
@@ -605,6 +604,11 @@ Plugin 'wellle/targets.vim'
 Plugin 'pangloss/vim-javascript'
 
 " }}}
+" YouCompleteMe {{{
+
+Plugin 'Valloric/YouCompleteMe'
+
+" }}}
 
 " Colors / themes {{{
 
@@ -633,7 +637,7 @@ set background=dark
 " my current favourite theme atm
 colorscheme gruvbox
 
-set guifont=DejaVu\ Sans\ Mono:12
+set guifont=Menlo:s12
 
 " }}}
 
