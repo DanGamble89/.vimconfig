@@ -19,6 +19,8 @@ set colorcolumn=+1
 
 set ruler
 
+set so=10
+
 " return to line open before last close
 augroup line_return
     au!
@@ -29,6 +31,13 @@ augroup line_return
         \ endif
 augroup END
 
+set statusline=
+set statusline+=%<\                       " cut at start
+set statusline+=%2*[%n%H%M%R%W]%*\        " flags and buf no
+set statusline+=%-40f\                    " path
+set statusline+=%=%1*%y%*%*\              " file type
+set statusline+=%10((%l,%c)%)\            " line and column
+set statusline+=%P                        " percentage of file
 " Mappings {{{
 
 " set leader to be the comma `,`
@@ -382,16 +391,6 @@ Plugin 'gmarik/Vundle.vim' " required
 " }}}
 " list of other plugins {{{
 
-" airline | adds a super sext status bar {{{
-
-Plugin 'bling/vim-airline'
-
-let g:airline_theme = 'base16'
-let g:airline_left_sep = ''
-let g:airline_right_sep = ''
-let g:airline_section_z = ''
-
-" }}}
 " ag | vim plugin for the silver searcher {{{
 
 Plugin 'rking/ag.vim'
@@ -584,10 +583,6 @@ Plugin 'tpope/vim-surround'
 " Syntastic {{{
 
 Plugin 'scrooloose/syntastic'
-
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
